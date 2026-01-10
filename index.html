@@ -3,15 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCHS Prints</title>
+    <title>PRNT</title>
     <style>
         /* --- DESIGN SETTINGS --- */
         :root {
             --bg-color: #ffffff;
             --text-color: #111111;
+            --card-bg: #ffffff;
             --accent-color: #000000;
             --gray-light: #f4f4f4;
             --border-color: #e5e5e5;
+            --badge-warn: #ff9800;
+            --badge-error: #f44336;
+            --gold: #FFD700;
+        }
+
+        /* DARK MODE VARIABLES */
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
+            --accent-color: #ffffff;
+            --gray-light: #2c2c2c;
+            --border-color: #333333;
         }
 
         body {
@@ -21,95 +35,149 @@
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        /* --- ERROR BOX (Hidden by default) --- */
-        #error-box {
-            display: none;
-            background: #ffebee;
-            color: #c62828;
-            padding: 20px;
-            margin: 20px;
-            border: 2px solid #ef5350;
-            border-radius: 8px;
-            font-family: monospace;
+        /* --- MARQUEE (SCROLLING TEXT) --- */
+        .marquee {
+            background: var(--accent-color); color: var(--bg-color);
+            overflow: hidden; white-space: nowrap; padding: 8px 0;
+            font-size: 0.85rem; font-weight: bold; text-transform: uppercase;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
         }
 
+        /* --- NAVIGATION --- */
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 100;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; border-bottom: 1px solid var(--border-color);
+            position: sticky; top: 0; background: var(--bg-color);
+            opacity: 0.98; z-index: 100;
         }
 
-        .logo { font-size: 1.2rem; font-weight: 700; text-transform: uppercase; }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        
+        .logo { font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
-        .cart-link {
-            cursor: pointer;
-            font-weight: 500;
-            font-size: 0.9rem;
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 4px;
-            transition: all 0.2s;
+        .nav-btn {
+            cursor: pointer; font-weight: 500; font-size: 0.9rem;
+            border: 1px solid var(--border-color); padding: 8px 16px;
+            border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
         }
 
-        .cart-link:hover { background: var(--text-color); color: white; border-color: var(--text-color); }
+        .nav-btn:hover {
+            background: var(--text-color); color: var(--bg-color); border-color: var(--text-color);
+        }
 
+        /* --- LAYOUT --- */
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        
+        .drop-banner {
+            background: var(--gray-light); padding: 10px; text-align: center;
+            font-size: 0.9rem; font-weight: 600; margin-bottom: 30px; border-radius: 4px;
+        }
+
         .intro { margin-bottom: 40px; max-width: 600px; }
         .intro h1 { font-size: 2.5rem; letter-spacing: -1px; margin-bottom: 10px; }
-        .intro p { color: #666; }
+        .intro p { color: #888; }
 
+        /* --- TOP SELLERS --- */
+        .top-sellers {
+            border: 2px solid var(--gold); border-radius: 8px; padding: 20px;
+            margin-bottom: 40px; position: relative;
+        }
+        .top-sellers::before {
+            content: "🏆 TOP SELLERS"; position: absolute; top: -12px; left: 20px;
+            background: var(--gold); color: black; padding: 0 10px;
+            font-weight: bold; font-size: 0.8rem; border-radius: 4px;
+        }
+        .ts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+
+        /* --- FILTERS --- */
+        .filters { margin-bottom: 30px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn {
+            background: transparent; border: 1px solid var(--border-color);
+            color: var(--text-color); padding: 8px 16px; border-radius: 20px;
+            cursor: pointer; font-size: 0.9rem; transition: 0.2s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--text-color); color: var(--bg-color); border-color: var(--text-color);
+        }
+
+        /* --- PRODUCT GRID --- */
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 40px 20px;
         }
 
-        .product-card { display: flex; flex-direction: column; transition: opacity 0.2s; }
-        .product-card:hover { opacity: 0.9; }
+        .product-card {
+            display: flex; flex-direction: column; 
+            background: var(--card-bg); border-radius: 8px;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute; top: 10px; left: 10px;
+            padding: 4px 8px; border-radius: 4px; color: white;
+            font-size: 0.75rem; font-weight: bold; text-transform: uppercase;
+            z-index: 10;
+        }
+        .badge.low { background-color: var(--badge-warn); }
+        .badge.out { background-color: var(--badge-error); }
+        .badge.mystery { background-color: #9c27b0; }
 
         .image-container {
-            background-color: var(--gray-light);
-            aspect-ratio: 1 / 1;
-            width: 100%;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 15px;
+            background-color: var(--gray-light); aspect-ratio: 1 / 1;
+            width: 100%; border-radius: 4px; overflow: hidden; margin-bottom: 15px;
         }
 
         .product-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
         .product-card:hover .product-img { transform: scale(1.03); }
 
-        .info { display: flex; justify-content: space-between; align-items: flex-start; }
+        .info { margin-bottom: 10px; }
         .product-name { font-weight: 600; font-size: 1rem; margin: 0; }
-        .product-price { color: #666; font-size: 0.95rem; margin-top: 4px; }
+        .product-price { color: #888; font-size: 0.95rem; margin-top: 4px; }
+
+        select.color-select {
+            width: 100%; padding: 8px; margin-bottom: 10px;
+            border: 1px solid var(--border-color); border-radius: 4px;
+            background: var(--bg-color); color: var(--text-color);
+        }
 
         .add-btn {
-            margin-top: 15px; width: 100%; padding: 12px;
-            background: transparent; border: 1px solid var(--border-color);
-            color: var(--text-color); font-weight: 600; cursor: pointer;
-            transition: all 0.2s;
+            width: 100%; padding: 12px; background: transparent;
+            border: 1px solid var(--border-color); color: var(--text-color);
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
-        .add-btn:hover { background: var(--text-color); color: white; border-color: var(--text-color); }
+        .add-btn:hover { background: var(--text-color); color: var(--bg-color); }
+        .add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+        /* --- FAQ --- */
+        .faq-section { margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--border-color); }
+        .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .request-btn {
+            display: inline-block; margin-top: 20px; text-decoration: none;
+            color: var(--text-color); border-bottom: 1px solid var(--text-color);
+            padding-bottom: 2px; font-weight: bold;
+        }
+
+        /* --- MODAL (Shared styles for Cart & Login) --- */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3); z-index: 200;
+            background: rgba(0,0,0,0.5); z-index: 200;
             align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;
         }
         .modal.active { display: flex; opacity: 1; }
 
         .modal-content {
-            background: white; width: 90%; max-width: 450px;
-            padding: 30px; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            background: var(--bg-color); width: 90%; max-width: 450px;
+            padding: 30px; border-radius: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
 
         .cart-header {
@@ -118,46 +186,123 @@
         }
 
         .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
-        .remove { color: #999; cursor: pointer; margin-left: 10px; font-size: 0.8rem; }
-        .remove:hover { color: #ff0000; }
+        .cart-item-details { font-size: 0.85rem; color: #888; }
+        .remove { color: #888; cursor: pointer; margin-left: 10px; font-size: 0.8rem; }
+        .remove:hover { color: var(--badge-error); }
+        .discount-row { color: #4caf50; font-weight: bold; display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-color); }
 
-        input[type="text"] {
+        input[type="text"], input[type="email"] {
             width: 100%; padding: 12px; margin-top: 20px;
-            border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 1rem;
+            border: 1px solid var(--border-color); border-radius: 4px; 
+            box-sizing: border-box; font-size: 1rem; background: var(--bg-color); color: var(--text-color);
         }
 
         .checkout-btn {
-            background: var(--accent-color); color: white; border: none;
+            background: var(--accent-color); color: var(--bg-color); border: none;
             width: 100%; padding: 15px; font-size: 1rem; font-weight: 600;
             margin-top: 15px; cursor: pointer;
         }
-        
-        .close-link {
-            text-align: center; display: block; margin-top: 15px;
-            color: #666; text-decoration: underline; cursor: pointer; font-size: 0.9rem;
+
+        /* --- BOSS KEY --- */
+        .boss-btn {
+            position: fixed; bottom: 20px; left: 20px;
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            padding: 10px; border-radius: 50%; cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 999;
+            font-size: 1.5rem;
         }
+        
+        #boss-screen {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; color: black; z-index: 10000; padding: 40px; font-family: 'Times New Roman', serif;
+        }
+        #boss-screen h1 { text-align: center; border-bottom: 1px solid black; padding-bottom: 20px; }
+        #boss-screen p { margin-bottom: 15px; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
 <div id="error-box"></div>
 
+<!-- BOSS MODE SCREEN -->
+<div id="boss-screen" onclick="toggleBossMode()">
+    <h1>Pre-Algebra - Homework 3.4</h1>
+    <p><strong>Name:</strong> ____________________ &nbsp;&nbsp;&nbsp; <strong>Date:</strong> ________</p>
+    <br>
+    <p>1. Evaluate the expression: 5 + (3 &times; 4) - 2</p>
+    <p style="margin-top: 100px;">2. Solve for x: 3x = 21</p>
+    <p style="margin-top: 100px;">3. Find the perimeter of a rectangle with length 8 and width 3.</p>
+    <p style="color: #999; font-size: 0.8rem; margin-top: 100px; text-align: center;">(Click anywhere to return to shop)</p>
+</div>
+
+<!-- BOSS BUTTON -->
+<div class="boss-btn" onclick="toggleBossMode()" title="Teacher Mode">🎓</div>
+
+<!-- MARQUEE -->
+<div class="marquee">
+    <div class="marquee-content">
+        📢 New Colors Available • Bundle Deal: Buy 3+ items, get $2 OFF! • Restock coming Sunday 5PM • 📢
+    </div>
+</div>
+
 <nav>
-    <div class="logo">SCHS Prints</div>
-    <div class="cart-link" onclick="toggleCart()">Cart (<span id="cart-count">0</span>)</div>
+    <div class="logo">PRNT</div>
+    <div class="nav-right">
+        <div class="nav-btn theme-toggle" onclick="toggleTheme()">🌙</div>
+        <div class="nav-btn" onclick="toggleLogin()" id="user-btn">👤 Login</div>
+        <div class="nav-btn cart-link" onclick="toggleCart()">Cart (<span id="cart-count">0</span>)</div>
+    </div>
 </nav>
 
 <div class="container">
+    <div class="drop-banner">
+        🔥 NEXT DROP IN: <span id="countdown">Loading...</span>
+    </div>
+
     <div class="intro">
-        <h1>Freshly Printed.</h1>
+        <h1 id="welcome-msg">Freshly Printed.</h1>
         <p>Order online. Pickup & Pay at <strong>Locker 253</strong>.</p>
-        <p style="font-size: 0.9rem; color: #888; margin-top:5px;">(yall need to lowk suggest more prints)</p>
+    </div>
+
+    <!-- TOP SELLERS -->
+    <div class="top-sellers">
+        <div class="ts-grid" id="top-sellers-grid">
+            <!-- Loaded via JS -->
+        </div>
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
+        <button class="filter-btn" onclick="filterProducts('fidget', this)">Fidgets</button>
+        <button class="filter-btn" onclick="filterProducts('tech', this)">Tech</button>
+        <button class="filter-btn" onclick="filterProducts('style', this)">Style</button>
+        <button class="filter-btn" onclick="filterProducts('bundle', this)">Bundles</button>
     </div>
 
     <div class="grid" id="product-grid">
+        <!-- Products load here -->
+    </div>
+
+    <div class="faq-section">
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>How do I pay?</h3>
+                <p>Cash or Apple Pay. Pay when you pick up your item at Locker 253.</p>
+            </div>
+            <div class="faq-item">
+                <h3>When is pickup?</h3>
+                <p>Between classes or after school. Just show me your order ticket.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Can I request a print?</h3>
+                <p>Yes! If you see a cool model online, let me know.</p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSfqQSphyWdzpTE4gcKEaplw28vfwDvucOHbb0pz48ErmiUIlQ/viewform?usp=publish-editor" target="_blank" class="request-btn">Request a Print →</a>
+            </div>
         </div>
+    </div>
 </div>
 
+<!-- Cart Modal -->
 <div class="modal" id="cart-modal">
     <div class="modal-content">
         <div class="cart-header">
@@ -165,164 +310,326 @@
             <span style="cursor:pointer" onclick="toggleCart()">✕</span>
         </div>
         
-        <div id="cart-items"><p style="color:#666">Your cart is empty.</p></div>
+        <div id="cart-items"><p style="color:#888">Your cart is empty.</p></div>
 
         <div style="margin-top: 20px; font-weight: bold; text-align: right;">
             Total: $<span id="cart-total">0.00</span>
         </div>
 
-        <input type="text" id="customer-name" placeholder="Enter Your Name" required>
+        <!-- Checkout name input (hidden if logged in) -->
+        <div id="guest-checkout-fields">
+            <input type="text" id="guest-name" placeholder="Enter Your Name" required>
+        </div>
         
         <button class="checkout-btn" onclick="checkout()">Checkout via Email</button>
-        <a class="close-link" onclick="toggleCart()">Continue Shopping</a>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal" id="login-modal">
+    <div class="modal-content">
+        <div class="cart-header">
+            <h2 style="margin:0">Student Login</h2>
+            <span style="cursor:pointer" onclick="toggleLogin()">✕</span>
+        </div>
+        
+        <div id="login-form">
+            <p>Enter your info once, and I'll remember you for next time!</p>
+            <input type="text" id="login-name" placeholder="Your Name" required>
+            <input type="text" id="login-email" placeholder="School Email (Optional)">
+            <button class="checkout-btn" onclick="login()">Login</button>
+        </div>
+
+        <div id="profile-view" style="display:none;">
+            <p>Logged in as: <strong id="profile-name"></strong></p>
+            <p>Email: <span id="profile-email"></span></p>
+            <button class="checkout-btn" style="background:var(--badge-error); margin-top:10px;" onclick="logout()">Log Out</button>
+        </div>
     </div>
 </div>
 
 <script>
-// --- SAFETY: Report errors to the user ---
-window.onerror = function(message, source, lineno, colno, error) {
-    const errorBox = document.getElementById('error-box');
-    errorBox.style.display = 'block';
-    errorBox.innerHTML = `<strong>⚠️ CODE ERROR:</strong><br>${message}<br>Line: ${lineno}`;
+window.onerror = function(msg, src, line) {
+    document.getElementById('error-box').style.display = 'block';
+    document.getElementById('error-box').innerHTML = `Error: ${msg} on line ${line}`;
 };
 
-// --- SETTINGS ---
-const myEmail = "yourname@ecsd.us"; // Put your email here
+const myEmail = "yourname@ecsd.us"; 
 
-// Note: I removed the extra spaces in the URLs to make them safer
+// --- 🛠️ PASTE YOUR MYSTERY IMAGE LINK HERE 🛠️ ---
+const mysteryImage = "data:image/png;base64,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"; 
+
+// --- USER AUTHENTICATION SYSTEM ---
+let currentUser = JSON.parse(localStorage.getItem('prnt_user')) || null;
+
+function checkLoginState() {
+    const btn = document.getElementById('user-btn');
+    const welcome = document.getElementById('welcome-msg');
+    
+    if (currentUser) {
+        btn.innerHTML = `👤 ${currentUser.name}`;
+        welcome.innerHTML = `Welcome back, ${currentUser.name}.`;
+        
+        // Hide guest fields in cart
+        document.getElementById('guest-checkout-fields').style.display = 'none';
+        
+        // Update Profile View
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('profile-view').style.display = 'block';
+        document.getElementById('profile-name').innerText = currentUser.name;
+        document.getElementById('profile-email').innerText = currentUser.email || 'N/A';
+    } else {
+        btn.innerHTML = `👤 Login`;
+        welcome.innerHTML = `Freshly Printed.`;
+        document.getElementById('guest-checkout-fields').style.display = 'block';
+        
+        // Show Login Form
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('profile-view').style.display = 'none';
+    }
+}
+
+function login() {
+    const name = document.getElementById('login-name').value;
+    const email = document.getElementById('login-email').value;
+    
+    if(!name) { alert("Please enter your name!"); return; }
+    
+    currentUser = { name: name, email: email };
+    localStorage.setItem('prnt_user', JSON.stringify(currentUser));
+    
+    checkLoginState();
+    toggleLogin(); // Close modal
+}
+
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('prnt_user');
+    checkLoginState();
+    toggleLogin();
+}
+
+function toggleLogin() {
+    const modal = document.getElementById('login-modal');
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    if(modal.style.display === 'flex') setTimeout(() => modal.style.opacity = '1', 10);
+    else modal.style.opacity = '0';
+}
+
+// --- PRODUCT DATA ---
 const products = [
-    {
-        id: 1,
-        name: "Articulated Dragon",
-        price: 5.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/US298af8211cf174/design/2025-12-24_f16687f23e846.png?x-oss-process=image/resize,w_400/format,webp"
-    },
-    {
-        id: 2,
-        name: "Phone Stand",
-        price: 3.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/US30d1cdf1dfd2ec/design/2025-12-21_0444552b3c14b.jpg?x-oss-process=image/resize,w_1000/format,webp"
-    },
-    {
-        id: 3,
-        name: "Fidget Cube",
-        price: 2.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/US2ecaa913482ae4/design/2025-07-03_e4c8e21007a008.jpg?x-oss-process=image/resize,w_400/format,webp"
-    },
-    {
-        id: 4,
-        name: "Controller Stand",
-        price: 8.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/USa0b3644d260674/design/2024-03-14_431474b151b9b.png?x-oss-process=image/resize,w_400/format,webp"
-    },
-    {
-        id: 5,
-        name: "Spiral Passthrough Fidget",
-        price: 3.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/UScf4025d436c6df/design/2025-11-08_0607cb90063fd.jpg?x-oss-process=image/resize,w_400/format,webp"
-    },
-    {
-        id: 6,
-        name: "Blanket Fidget",
-        price: 5.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/US2e230a38334cc9/design/2024-12-18_73ca0f4294103.jpeg?x-oss-process=image/resize,w_1000/format,webp"
-    },
-    {
-        id: 7, 
-        name: "Star Fidget",
-        price: 3.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/US315ad26a65a9e/design/2024-09-23_4a173a1c6e039.png?x-oss-process=image/resize,w_1000/format,webp"
-    },
-    {
-        id: 8,  // Make sure this number is different for every item
-        name: "Chopstick Hands",
-        price: 1.00,
-        image: "https://makerworld.bblmw.com/makerworld/model/US5f2180ce19256f/design/2024-11-01_f4f0f383132bb8.png?x-oss-process=image/resize,w_1000/format,webp"
-    },
+    { id: 1, name: "Articulated Dragon", price: 5.00, cat: "decor", stock: "out", image: "https://makerworld.bblmw.com/makerworld/model/US298af8211cf174/design/2025-12-24_f16687f23e846.png?x-oss-process=image/resize,w_400/format,webp" },
+    { id: 2, name: "Phone Stand", price: 3.00, cat: "tech", stock: "low", image: "https://makerworld.bblmw.com/makerworld/model/US30d1cdf1dfd2ec/design/2025-12-21_0444552b3c14b.jpg?x-oss-process=image/resize,w_1000/format,webp" },
+    { id: 3, name: "Fidget Cube", price: 2.00, cat: "fidget", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/US2ecaa913482ae4/design/2025-07-03_e4c8e21007a008.jpg?x-oss-process=image/resize,w_400/format,webp" },
+    { id: 4, name: "Controller Stand", price: 8.00, cat: "tech", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/USa0b3644d260674/design/2024-03-14_431474b151b9b.png?x-oss-process=image/resize,w_400/format,webp" },
+    { id: 5, name: "Spiral Fidget", price: 3.00, cat: "fidget", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/UScf4025d436c6df/design/2025-11-08_0607cb90063fd.jpg?x-oss-process=image/resize,w_400/format,webp" },
+    { id: 6, name: "Blanket Fidget", price: 5.00, cat: "fidget", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/US2e230a38334cc9/design/2024-12-18_73ca0f4294103.jpeg?x-oss-process=image/resize,w_1000/format,webp" },
+    { id: 7, name: "Star Fidget", price: 3.00, cat: "fidget", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/US315ad26a65a9e/design/2024-09-23_4a173a1c6e039.png?x-oss-process=image/resize,w_1000/format,webp" },
+    { id: 8, name: "Clicker Fidget", price: 1.00, cat: "fidget", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/USc40f1f70049c83/design/2025-11-13_207cec449ea8a.png?x-oss-process=image/resize,w_1000/format,webp" },
+    { id: 99, name: "Mystery Print (Gacha)", price: 2.00, cat: "fidget", stock: "ok", image: mysteryImage },
+    
+    // NEW BUNDLES
+    { id: 101, name: "Fidget Frenzy Bundle", price: 5.00, cat: "bundle", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/US298af8211cf174/design/2025-12-24_f16687f23e846.png?x-oss-process=image/resize,w_400/format,webp" }, 
+    { id: 102, name: "Tech Loadout Bundle", price: 10.00, cat: "bundle", stock: "ok", image: "https://makerworld.bblmw.com/makerworld/model/USa0b3644d260674/design/2024-03-14_431474b151b9b.png?x-oss-process=image/resize,w_400/format,webp" },
+    { id: 103, name: "Mystery Sack (3x)", price: 5.00, cat: "bundle", stock: "ok", image: mysteryImage }
 ];
+
+const colorOptions = ["Random / Surprise Me", "Black", "White", "Blue", "Red", "Green", "Multicolor (+$2)"];
 
 // --- LOGIC ---
 let cart = [];
 const grid = document.getElementById('product-grid');
-const modal = document.getElementById('cart-modal');
+const tsGrid = document.getElementById('top-sellers-grid');
 
-// Load Products with safety check
-try {
-    if(!grid) throw new Error("Could not find product-grid element");
+// 1. RENDER TOP SELLERS (Hardcoded IDs)
+function renderTopSellers() {
+    const topIds = [5,7,8];
+    const topItems = products.filter(p => topIds.includes(p.id));
     
-    grid.innerHTML = products.map(p => `
+    tsGrid.innerHTML = topItems.map(p => {
+        let options = colorOptions.map(c => `<option value="${c}">${c}</option>`).join('');
+        return `
         <div class="product-card">
+            <div class="image-container" style="height: 150px;">
+                <img src="${p.image}" alt="${p.name}" class="product-img">
+            </div>
+            <div style="padding: 10px;">
+                <h3 style="font-size:0.9rem; margin:0;">${p.name}</h3>
+                <div style="color:#888; font-size:0.9rem;">$${p.price.toFixed(2)}</div>
+                <select id="ts-color-${p.id}" class="color-select" style="margin:5px 0;">${options}</select>
+                <button class="add-btn" onclick="addToCart(${p.id}, 'ts-')">Add</button>
+            </div>
+        </div>
+    `}).join('');
+}
+
+// 2. RENDER MAIN GRID
+function renderGrid(filterCat) {
+    const filtered = filterCat === 'all' ? products : products.filter(p => p.cat === filterCat);
+    
+    grid.innerHTML = filtered.map(p => {
+        let badgeHtml = '';
+        let btnDisabled = '';
+        let btnText = 'Add to Cart';
+        
+        if (p.id === 99 || p.cat === 'bundle') badgeHtml = `<div class="badge mystery">DEAL</div>`;
+        else if (p.stock === 'low') badgeHtml = `<div class="badge low">Low Stock</div>`;
+        
+        if (p.stock === 'out') {
+            badgeHtml = `<div class="badge out">Sold Out</div>`;
+            btnDisabled = 'disabled';
+            btnText = 'Sold Out';
+        }
+
+        const options = colorOptions.map(c => `<option value="${c}">${c}</option>`).join('');
+
+        return `
+        <div class="product-card">
+            ${badgeHtml}
             <div class="image-container">
                 <img src="${p.image}" alt="${p.name}" class="product-img">
             </div>
-            <div class="info">
-                <div>
+            <div style="padding: 0 15px 15px;">
+                <div class="info">
                     <h3 class="product-name">${p.name}</h3>
                     <div class="product-price">$${p.price.toFixed(2)}</div>
                 </div>
+                
+                <select id="color-${p.id}" class="color-select" ${btnDisabled}>
+                    ${options}
+                </select>
+
+                <button class="add-btn" onclick="addToCart(${p.id})" ${btnDisabled}>${btnText}</button>
             </div>
-            <button class="add-btn" onclick="addToCart(${p.id})">Add to Cart</button>
         </div>
-    `).join('');
-} catch (e) {
-    alert("Error loading products: " + e.message);
+    `}).join('');
 }
 
-function addToCart(id) {
+function filterProducts(category, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderGrid(category);
+}
+
+// 3. CART FUNCTIONS (With Bundle Logic)
+function addToCart(id, prefix = '') {
     const item = products.find(p => p.id === id);
-    cart.push(item);
-    updateCart();
+    const colorSelect = document.getElementById(`${prefix}color-${id}`);
+    const selectedColor = colorSelect ? colorSelect.value : "Random";
+
+    cart.push({ ...item, selectedColor });
+    updateCartUI();
     toggleCart();
 }
 
 function removeFromCart(index) {
     cart.splice(index, 1);
-    updateCart();
+    updateCartUI();
 }
 
-function updateCart() {
+function updateCartUI() {
     document.getElementById('cart-count').innerText = cart.length;
     const container = document.getElementById('cart-items');
     let total = 0;
     
-    if (cart.length === 0) {
-        container.innerHTML = '<p style="color:#666">Your cart is empty.</p>';
-    } else {
-        container.innerHTML = cart.map((item, index) => {
-            total += item.price;
-            return `<div class="cart-item">
-                <span>${item.name}</span>
-                <div>$${item.price.toFixed(2)} <span class="remove" onclick="removeFromCart(${index})">Remove</span></div>
-            </div>`;
-        }).join('');
-    }
-    document.getElementById('cart-total').innerText = total.toFixed(2);
-}
+    // Render Items
+    const itemsHtml = cart.map((item, index) => {
+        total += item.price;
+        return `
+        <div class="cart-item">
+            <div>
+                <div>${item.name}</div>
+                <div class="cart-item-details">Color: ${item.selectedColor}</div>
+            </div>
+            <div>$${item.price.toFixed(2)} <span class="remove" onclick="removeFromCart(${index})">Remove</span></div>
+        </div>`;
+    }).join('');
 
-function toggleCart() {
-    if (modal.style.display === 'flex') {
-        modal.style.opacity = '0';
-        setTimeout(() => modal.style.display = 'none', 300);
-    } else {
-        modal.style.display = 'flex';
-        setTimeout(() => modal.style.opacity = '1', 10);
+    // Bundle Logic
+    let discountHtml = '';
+    if (cart.length >= 3) {
+        total -= 2.00;
+        discountHtml = `<div class="discount-row"><span>Bundle Discount (3+ Items)</span><span>-$2.00</span></div>`;
     }
+
+    if (cart.length === 0) container.innerHTML = '<p style="color:#888">Your cart is empty.</p>';
+    else container.innerHTML = itemsHtml + discountHtml;
+    
+    document.getElementById('cart-total').innerText = total.toFixed(2);
 }
 
 function checkout() {
     if (cart.length === 0) { alert("Cart is empty"); return; }
-    const name = document.getElementById('customer-name').value;
+    
+    // Check if we use logged in name or guest name
+    let name = "";
+    if (currentUser) {
+        name = currentUser.name;
+    } else {
+        name = document.getElementById('guest-name').value;
+    }
+
     if (!name) { alert("Please enter your name"); return; }
 
     let total = 0;
-    let list = cart.map(i => { total += i.price; return `• ${i.name} ($${i.price})`; }).join('%0D%0A');
+    let list = cart.map(i => { total += i.price; return `• ${i.name} [${i.selectedColor}] - $${i.price}`; }).join('%0D%0A');
+    
+    // Apply discount logic in text
+    if (cart.length >= 3) {
+        total -= 2.00;
+        list += '%0D%0A• BUNDLE DISCOUNT applied (-$2.00)';
+    }
+
     const subject = `Order for ${name}`;
-    const body = `Hi, I'd like to buy:%0D%0A%0D%0A${list}%0D%0A%0D%0ATotal: $${total.toFixed(2)}%0D%0A%0D%0APaying cash at Locker 253.`;
+    const body = `Hi, I'd like to buy:%0D%0A%0D%0A${list}%0D%0A%0D%0ATotal: $${total.toFixed(2)}%0D%0A%0D%0APaying via Cash or Apple Pay at Locker 253.`;
     window.location.href = `mailto:${myEmail}?subject=${subject}&body=${body}`;
 }
 
-modal.addEventListener('click', (e) => { if (e.target === modal) toggleCart(); });
-</script>
+// 4. UTILS
+function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+}
 
+function toggleBossMode() {
+    const screen = document.getElementById('boss-screen');
+    screen.style.display = screen.style.display === 'block' ? 'none' : 'block';
+}
+
+function updateCountdown() {
+    const now = new Date();
+    const nextDrop = new Date();
+    nextDrop.setDate(now.getDate() + (1 + 7 - now.getDay()) % 7);
+    nextDrop.setHours(8, 0, 0, 0);
+    if (nextDrop < now) nextDrop.setDate(nextDrop.getDate() + 7);
+
+    const diff = nextDrop - now;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / 1000 / 60) % 60);
+    document.getElementById('countdown').innerText = `${days}d ${hours}h ${minutes}m`;
+}
+setInterval(updateCountdown, 60000);
+updateCountdown();
+
+// Init
+if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+renderGrid('all');
+renderTopSellers();
+checkLoginState(); // Check if user is logged in
+
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    if(modal.style.display === 'flex') setTimeout(() => modal.style.opacity = '1', 10);
+    else modal.style.opacity = '0';
+}
+document.getElementById('cart-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('cart-modal')) toggleCart();
+});
+document.getElementById('login-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('login-modal')) toggleLogin();
+});
+</script>
 </body>
 </html>
